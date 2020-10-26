@@ -25,13 +25,22 @@ const gameSchema = new mongoose.Schema({
 
 });
 
+const playerSchema = new mongoose.Schema({
+  playerID : Number,
+  playerName : String,
+  favoriteGenre: String,
+  personalDescription : String,
+  gamerScore: Number
+})
+
 const Game = mongoose.model('Game', gameSchema);
+const Player = mongoose.model('Player', playerSchema);
 
 app.get('/', (req, res) => {
 
     res.send('This is working');
   })
-  
+
   app.get('/addGame/:gameID/:name/:gameType/:releaseYear/:gameDesc', (req, res) => {
     
     const newGame = new Game
@@ -55,6 +64,29 @@ app.get('/', (req, res) => {
       .catch((err) =>
         console.error(err));
   });
+
+  app.get('/addPlayer/:playerID/:playerName/:favoriteGenre/:personalDescription/:gamerScore', (req, res) => {
+    const newPlayer = new Player
+    ({
+      playerID: req.params.playerID,
+      playerName: req.params.playerName,
+      favoriteGenre: req.params.favoriteGenre,
+      personalDescription: req.params.personalDescription,
+      gamerScore: req.params.gamerScore
+    });
+
+     newPlayer.save()
+     .then(
+       (result) => res.send(`${req.params.playerID} was saved`),
+       (result) => res.send(`${req.params.playerName} was saved`),
+       (result) => res.send(`${req.params.favoriteGenre} was saved`),
+       (result) => res.send(`${req.params.personalDescription} was saved`),
+       (result) => res.send(`${req.params.gamerScore} was saved`)
+     )
+     .catch((err) =>
+      console.error(err));
+  });
+  
   
   app.listen(port, () => console.log(`Example app listening on 
     : ${port}!`))
