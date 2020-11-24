@@ -28,7 +28,7 @@ function getGames(req, res, options = []) {
 
     Game.find(filter)
     .limit(limitNumber)
-    .then((result) 
+    .then((result) => {
         res.json(result)
     })
     
@@ -49,7 +49,45 @@ function createGame(req, res) {
 }
 
 function findgamebyID(req, res) {
-    const id = req.params.gameID
+    const id = req.params.id;
+    Game.findById(id)
+    .then((result) => {
+        console.log('result', +result.uri);
+
+        res.json(result)
+    })
 }
 
-export default {createGame, getGames}
+function updateGame(req, res) {
+    const id = req.params.id;
+    console.log('Updating game ' +id)
+
+    Game.findByIdAndUpdate({_id: id}, {...req.body})
+    .then((result) => {
+        if (result)
+        {
+            res.status(200).send({message: 'game has been updated'})
+        }
+        else
+        {
+            res.status(404).send({message: 'game was not found'})
+        }
+    })
+}
+
+function deleteGame(req, res) {
+    const id = req.params.id;
+
+    Game.findByIdAndDelete(id)
+    .then((result) => {
+        if (result) {
+            res.status(203).send({message: 'deleted'})
+        }
+        else
+        {
+            res.status(404).send({message: 'game was not found'})
+        }
+    })
+}
+
+export default {createGame, getGames, findgamebyID, updateGame, deleteGame}
