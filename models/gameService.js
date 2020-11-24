@@ -88,6 +88,7 @@ function deleteGame(req, res) {
             res.status(404).send({message: 'game was not found'})
         }
     })
+    //push
 }
 
 export default {createGame, getGames, findgamebyID, updateGame, deleteGame}
