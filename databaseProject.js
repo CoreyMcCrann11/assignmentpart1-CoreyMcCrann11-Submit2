@@ -1,91 +1,41 @@
 import mongoose from 'mongoose';
 import express from 'express';
+import game from './routes/games';
 
 const app = express();
 
 const port = 3000
 
-mongoose.connect('mongodb://localhost:27017/gameDatabase', {
+const connectionString = 'mongodb://127.0.0.1:27017/gameDatabaseProper'
+
+mongoose.connect(connectionString, {
   "useNewUrlParser": true,
-  "useUnifiedTopology": true
-});
-
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-  console.log('DB connected')
-});
-
-const gameSchema = new mongoose.Schema({
-  gameID: Number,
-  name: String,
-  gameType: String,
-  releaseYear: Number,
-  gameDesc: String
-
-});
-
-const playerSchema = new mongoose.Schema({
-  playerID : Number,
-  playerName : String,
-  favoriteGenre: String,
-  personalDescription : String,
-  gamerScore: Number
+  "useUnifiedTopology": true,
+  'useCreateIndex' : true
+}).
+catch( error => {
+  console.log('Database connection refused' + error);
+  process.exit(2);
 })
 
-const Game = mongoose.model('Game', gameSchema);
-const Player = mongoose.model('Player', playerSchema);
+const db = mongoose.connection;
 
-app.get('/', (req, res) => {
+db.on('error', console.error.bind(console, 'connection error :'));
 
-    res.send('This is working');
-  })
+db.once('open', () => {
+  console.log("DB connected")
+});
 
-  app.get('/addGame/:gameID/:name/:gameType/:releaseYear/:gameDesc', (req, res) => {
-    
-    const newGame = new Game
-    ({
-    gameID: req.params.gameID,
-    name: req.params.name,
-    gameType: req.params.gameType,
-    releaseYear: req.params.releaseDate,
-    gameDesc: req.params.gameDesc
-    });
-  
-    newGame.save()
-      .then(
-          (result) => res.send(`${req.params.gameID} was saved`),
-          (result) => res.send(`${req.params.name} was saved`),
-          (result) => res.send(`${req.params.gameType} was saved`),
-          (result) => res.send(`${req.params.releaseYear} was saved`),
-          (result) => res.send(`${req.params.gameDesc} was saved`)
-          
-          )
-      .catch((err) =>
-        console.error(err));
-  });
+app.use(express.urlencoded({ extended: false}));
+app.use(express.json());
 
-  app.get('/addPlayer/:playerID/:playerName/:favoriteGenre/:personalDescription/:gamerScore', (req, res) => {
-    const newPlayer = new Player
-    ({
-      playerID: req.params.playerID,
-      playerName: req.params.playerName,
-      favoriteGenre: req.params.favoriteGenre,
-      personalDescription: req.params.personalDescription,
-      gamerScore: req.params.gamerScore
-    });
+app.use('/games', game);
 
-     newPlayer.save()
-     .then(
-       (result) => res.send(`${req.params.playerID} was saved`),
-       (result) => res.send(`${req.params.playerName} was saved`),
-       (result) => res.send(`${req.params.favoriteGenre} was saved`),
-       (result) => res.send(`${req.params.personalDescription} was saved`),
-       (result) => res.send(`${req.params.gamerScore} was saved`)
-     )
-     .catch((err) =>
-      console.error(err));
-  });
+app.get('/', (req, res) => 
+res.send('This thing is working'));
+
+
+
   
   
   app.listen(port, () => console.log(`Example app listening on 
